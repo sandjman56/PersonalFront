@@ -21,6 +21,7 @@
       --glow-2: rgba(15, 98, 254, 0.35);
       --glow-3: rgba(0, 195, 255, 0.25);
       --grid-line: rgba(111, 82, 237, 0.12);
+      --overlay-color: rgba(255, 255, 255, 0.55);
     }
 
     body.dark-mode {
@@ -36,6 +37,7 @@
       --glow-2: rgba(100, 181, 246, 0.4);
       --glow-3: rgba(3, 218, 197, 0.3);
       --grid-line: rgba(255, 255, 255, 0.12);
+      --overlay-color: rgba(8, 10, 25, 0.7);
     }
 
     body {
@@ -51,6 +53,40 @@
       overflow-x: hidden;
     }
 
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -4;
+      pointer-events: none;
+      background: radial-gradient(circle at 20% 20%, rgba(15, 98, 254, 0.08), transparent 55%),
+                  radial-gradient(circle at 80% 30%, rgba(111, 82, 237, 0.12), transparent 60%),
+                  radial-gradient(circle at 50% 80%, rgba(0, 195, 255, 0.08), transparent 65%),
+                  #05070f;
+    }
+
+    .background-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      background: linear-gradient(135deg, var(--overlay-color), rgba(12, 20, 40, 0.55));
+      mix-blend-mode: lighten;
+      opacity: 0.85;
+      transition: opacity 0.6s ease;
+    }
+
+    body:not(.dark-mode) .background-overlay {
+      mix-blend-mode: multiply;
+      background: linear-gradient(135deg, var(--overlay-color), rgba(220, 230, 255, 0.35));
+      opacity: 0.7;
+    }
+
     body::before,
     body::after {
       content: "";
@@ -60,7 +96,7 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: -1;
+      z-index: -3;
       transition: opacity 0.6s ease, filter 0.6s ease;
     }
 
@@ -74,7 +110,8 @@
     body::after {
       background-image: repeating-linear-gradient(to right, var(--grid-line), var(--grid-line) 1px, transparent 1px, transparent 70px),
                         repeating-linear-gradient(to bottom, var(--grid-line), var(--grid-line) 1px, transparent 1px, transparent 70px);
-      opacity: 0.18;
+      opacity: 0.14;
+      z-index: -2;
       animation: driftGrid 24s linear infinite;
     }
 
@@ -231,7 +268,10 @@
   </style>
 </head>
 <body class="dark-mode">
-    
+
+  <canvas id="particle-canvas"></canvas>
+  <div class="background-overlay"></div>
+
   <header>
     <h1>Sander Schulman</h1>
     <p class="intro">
@@ -291,11 +331,11 @@
       <a href="seemore.html">See More</a>
     </div>
   </section>
-<!-- Contact & Resume Section -->
+<!-- Contact Section -->
 <section id="contact" style="margin-top: 80px;">
   <h2>Get in Touch</h2>
   <p style="max-width: 600px; margin: 0 auto 30px; font-size: 1rem; color: var(--text-color);">
-    I'm always open to new opportunities, collaborations, or just a chat. Feel free to reach out or view my resume below.
+    I'm always open to new opportunities, collaborations, or just a chat. Feel free to reach out anytime.
   </p>
 
   <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
@@ -308,16 +348,6 @@
       font-weight: 600;
       transition: background 0.3s;
     " onmouseover="this.style.backgroundColor='var(--accent-alt)'" onmouseout="this.style.backgroundColor='var(--accent)'">Email Me</a>
-
-    <a href="SanderSchulmanResume.docx.pdf" target="_blank" style="
-      background-color: var(--accent);
-      color: var(--button-text);
-      padding: 12px 24px;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: 600;
-      transition: background 0.3s;
-    " onmouseover="this.style.backgroundColor='var(--accent-alt)'" onmouseout="this.style.backgroundColor='var(--accent)'">View Resume</a>
   </div>
 </section>
 
@@ -325,6 +355,121 @@
     function toggleTheme() {
       document.body.classList.toggle('dark-mode');
     }
+
+    (function () {
+      const canvas = document.getElementById('particle-canvas');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      const particles = [];
+      const config = {
+        maxDistance: 160,
+        baseSpeed: 0.08,
+        density: 0.00012,
+        size: [1.2, 2.8]
+      };
+
+      let width = 0;
+      let height = 0;
+      let dpr = window.devicePixelRatio || 1;
+
+      class Particle {
+        constructor() {
+          this.reset(true);
+        }
+
+        reset(initial = false) {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          const angle = Math.random() * Math.PI * 2;
+          const speed = (config.baseSpeed + Math.random() * config.baseSpeed) * dpr;
+          this.vx = Math.cos(angle) * speed;
+          this.vy = Math.sin(angle) * speed;
+          this.radius = (config.size[0] + Math.random() * (config.size[1] - config.size[0])) * dpr;
+          if (!initial) {
+            this.x = Math.random() < 0.5 ? 0 : width;
+            this.y = Math.random() * height;
+          }
+        }
+
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+
+          if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+            this.reset();
+          }
+        }
+
+        draw() {
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(176, 196, 255, 0.9)';
+          ctx.shadowBlur = 15 * dpr;
+          ctx.shadowColor = 'rgba(111, 82, 237, 0.85)';
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+
+      function createParticles() {
+        particles.length = 0;
+        const targetCount = Math.min(140, Math.floor(width * height * config.density));
+        for (let i = 0; i < targetCount; i++) {
+          particles.push(new Particle());
+        }
+      }
+
+      function connectParticles() {
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const p1 = particles[i];
+            const p2 = particles[j];
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < config.maxDistance * dpr) {
+              const opacity = 1 - distance / (config.maxDistance * dpr);
+              ctx.strokeStyle = `rgba(111, 82, 237, ${0.22 * opacity})`;
+              ctx.lineWidth = 0.8 * dpr;
+              ctx.shadowBlur = 8 * opacity * dpr;
+              ctx.shadowColor = 'rgba(15, 98, 254, 0.6)';
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+              ctx.shadowBlur = 0;
+            }
+          }
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach((particle) => {
+          particle.update();
+          particle.draw();
+        });
+        connectParticles();
+        requestAnimationFrame(animate);
+      }
+
+      function resizeCanvas() {
+        dpr = window.devicePixelRatio || 1;
+        width = window.innerWidth * dpr;
+        height = window.innerHeight * dpr;
+        canvas.width = width;
+        canvas.height = height;
+        canvas.style.width = window.innerWidth + 'px';
+        canvas.style.height = window.innerHeight + 'px';
+        createParticles();
+      }
+
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+      animate();
+    })();
   </script>
 </body>
 </html>
