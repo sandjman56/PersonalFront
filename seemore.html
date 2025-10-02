@@ -7,37 +7,61 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-color: #fff6eb;
-      --text-color: #2b2622;
-      --card-bg: #ffffff;
-      --card-border: #f2d7b8;
-      --accent: #ff7a59;
-      --accent-alt: #ffb347;
-      --hover-glow: rgba(255, 158, 106, 0.25);
-      --button-text: #fff7f0;
-      --glow-1: rgba(255, 200, 160, 0.35);
-      --glow-2: rgba(255, 170, 120, 0.35);
-      --glow-3: rgba(255, 235, 190, 0.25);
-      --grid-line: rgba(255, 200, 160, 0.16);
-      --overlay-color: rgba(255, 244, 230, 0.65);
+      --bg-color: #07121d;
+      --text-color: #d9e9f7;
+      --muted-text: rgba(201, 224, 240, 0.78);
+      --card-bg: rgba(9, 26, 39, 0.82);
+      --card-border: rgba(65, 158, 187, 0.35);
+      --accent: #4fd8c2;
+      --accent-alt: #5caeff;
+      --hover-glow: rgba(79, 216, 194, 0.45);
+      --button-text: #04131d;
+      --glow-1: rgba(38, 128, 157, 0.28);
+      --glow-2: rgba(35, 92, 139, 0.26);
+      --glow-3: rgba(39, 174, 155, 0.23);
+      --grid-line: rgba(82, 160, 202, 0.15);
+      --overlay-color: rgba(8, 24, 42, 0.6);
       --theme-shift-duration: 1.35s;
       --motion-duration: 16s;
+      --star-color: rgba(145, 234, 255, 0.92);
+      --star-glow: rgba(70, 205, 198, 0.6);
+      --constellation-color: 76, 185, 220;
+      --constellation-glow: rgba(45, 140, 170, 0.45);
+      --aurora-base: #020910;
+      --aurora-low: rgba(4, 20, 35, 0.92);
+      --aurora-high: rgba(12, 42, 62, 0.78);
+      --aurora-green: rgba(72, 196, 170, 0.42);
+      --aurora-blue: rgba(46, 128, 210, 0.38);
+      --aurora-violet: rgba(55, 94, 188, 0.32);
+      --surface-glow: rgba(79, 216, 194, 0.2);
     }
 
     body.dark-mode {
-      --bg-color: #121212;
-      --text-color: #e0e0e0;
-      --card-bg: #1f1f1f;
-      --card-border: #333;
-      --accent: #64b5f6;
-      --accent-alt: #bb86fc;
-      --hover-glow: rgba(187, 134, 252, 0.2);
-      --button-text: #121212;
-      --glow-1: rgba(187, 134, 252, 0.4);
-      --glow-2: rgba(100, 181, 246, 0.4);
-      --glow-3: rgba(3, 218, 197, 0.3);
-      --grid-line: rgba(255, 255, 255, 0.12);
-      --overlay-color: rgba(8, 10, 25, 0.7);
+      --bg-color: #02060d;
+      --text-color: #ecfbff;
+      --muted-text: rgba(216, 238, 250, 0.82);
+      --card-bg: rgba(4, 18, 28, 0.86);
+      --card-border: rgba(76, 199, 210, 0.45);
+      --accent: #5cf7d6;
+      --accent-alt: #4ab8ff;
+      --hover-glow: rgba(112, 255, 234, 0.45);
+      --button-text: #03161f;
+      --glow-1: rgba(31, 149, 255, 0.28);
+      --glow-2: rgba(60, 204, 215, 0.3);
+      --glow-3: rgba(40, 120, 210, 0.24);
+      --grid-line: rgba(76, 152, 210, 0.18);
+      --overlay-color: rgba(3, 20, 34, 0.72);
+      --star-color: rgba(160, 255, 241, 0.94);
+      --star-glow: rgba(68, 234, 208, 0.7);
+      --constellation-color: 90, 210, 255;
+      --constellation-glow: rgba(40, 160, 188, 0.5);
+      --aurora-base: #00050b;
+      --aurora-low: rgba(1, 14, 26, 0.94);
+      --aurora-high: rgba(6, 28, 52, 0.82);
+      --aurora-green: rgba(92, 255, 210, 0.4);
+      --aurora-blue: rgba(52, 168, 255, 0.36);
+      --aurora-violet: rgba(62, 110, 214, 0.3);
+      --surface-glow: rgba(112, 255, 234, 0.24);
     }
 
     body {
@@ -47,68 +71,37 @@
       color: var(--text-color);
       text-align: center;
       padding: 20px;
-      transition: background 0.4s, color 0.4s;
       min-height: 100vh;
       position: relative;
       overflow-x: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      scroll-behavior: smooth;
     }
 
     #particle-canvas,
-    #lightwave-canvas {
+    #aurora-canvas {
       position: fixed;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100%;
       height: 100%;
-      z-index: -4;
       pointer-events: none;
-      opacity: 0;
-      transition: opacity var(--theme-shift-duration) ease-in-out,
-                  filter var(--theme-shift-duration) ease-in-out;
+      transition: opacity var(--theme-shift-duration) ease, filter var(--theme-shift-duration) ease;
       will-change: opacity, filter;
     }
 
+    #aurora-canvas {
+      z-index: -7;
+    }
+
     #particle-canvas {
-      background: radial-gradient(circle at 20% 20%, rgba(15, 98, 254, 0.08), transparent 55%),
-                  radial-gradient(circle at 80% 30%, rgba(111, 82, 237, 0.12), transparent 60%),
-                  radial-gradient(circle at 50% 80%, rgba(0, 195, 255, 0.08), transparent 65%),
-                  #05070f;
-    }
-
-    #lightwave-canvas {
-      z-index: -5;
-    }
-
-    body.dark-mode #particle-canvas {
-      opacity: 1;
-      filter: blur(0px);
-    }
-
-    body.dark-mode #lightwave-canvas {
-      opacity: 0;
-      filter: blur(25px) saturate(0.9);
-    }
-
-    body.light-mode #particle-canvas {
-      opacity: 0;
-      filter: blur(25px) saturate(1.25);
-    }
-
-    body.light-mode #lightwave-canvas {
-      opacity: 1;
-      filter: blur(0px);
-    }
-
-    body.theme-transition #particle-canvas,
-    body.theme-transition #lightwave-canvas {
-      transition-duration: var(--theme-shift-duration);
+      z-index: -6;
     }
 
     .static-background-layer {
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: -6;
+      z-index: -8;
       opacity: 0;
       transition: opacity var(--theme-shift-duration) ease-in-out;
     }
@@ -122,23 +115,93 @@
     }
 
     .static-background-layer.static-light {
-      background: radial-gradient(circle at 10% 20%, rgba(255, 200, 140, 0.72), transparent 55%),
-                  radial-gradient(circle at 80% 35%, rgba(255, 166, 97, 0.65), transparent 60%),
-                  linear-gradient(135deg, rgba(255, 220, 180, 0.9), rgba(255, 183, 124, 0.9));
+      background: linear-gradient(140deg, #081926 0%, #0f2434 48%, #07131e 100%);
     }
 
     .static-background-layer.static-light::after {
       background-image:
-        radial-gradient(circle at 15% 90%, rgba(255, 255, 255, 0.25) 0%, transparent 55%),
-        radial-gradient(circle at 40% 110%, rgba(255, 255, 255, 0.18) 0%, transparent 60%),
-        radial-gradient(circle at 85% 100%, rgba(255, 255, 255, 0.22) 0%, transparent 55%);
-      opacity: 0.8;
+        radial-gradient(circle at 15% 85%, rgba(90, 180, 255, 0.18) 0%, transparent 55%),
+        radial-gradient(circle at 78% 20%, rgba(90, 220, 200, 0.16) 0%, transparent 60%);
+      opacity: 0.6;
     }
 
     .static-background-layer.static-dark {
-      background: radial-gradient(circle at 20% 20%, rgba(17, 59, 133, 0.42), transparent 55%),
-                  radial-gradient(circle at 80% 30%, rgba(64, 39, 145, 0.45), transparent 55%),
-                  linear-gradient(140deg, rgba(5, 9, 20, 0.95), rgba(7, 15, 36, 0.95));
+      background: linear-gradient(150deg, #010409 0%, #001220 48%, #011b28 100%);
+    }
+
+    .background-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -5;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(90, 226, 205, 0.2), transparent 55%),
+        radial-gradient(circle at 82% 22%, rgba(88, 163, 255, 0.18), transparent 60%),
+        linear-gradient(135deg, var(--overlay-color), rgba(6, 18, 36, 0.78));
+      mix-blend-mode: screen;
+      opacity: 0.75;
+      transition: opacity 0.6s ease, filter 0.6s ease;
+    }
+
+    body.light-mode .background-overlay {
+      filter: saturate(1.15);
+      opacity: 0.7;
+    }
+
+    body.dark-mode .background-overlay {
+      filter: saturate(1.25);
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -4;
+      transition: opacity 0.6s ease, filter 0.6s ease;
+    }
+
+    body::before {
+      background:
+        radial-gradient(circle at 20% 24%, var(--glow-1), transparent 58%),
+        radial-gradient(circle at 80% 30%, var(--glow-2), transparent 60%),
+        radial-gradient(circle at 50% 85%, var(--glow-3), transparent 65%);
+      animation: floatGlow 22s ease-in-out infinite alternate;
+    }
+
+    body::after {
+      z-index: -3;
+      background-image:
+        repeating-linear-gradient(to right, var(--grid-line), var(--grid-line) 1px, transparent 1px, transparent 70px),
+        repeating-linear-gradient(to bottom, var(--grid-line), var(--grid-line) 1px, transparent 1px, transparent 70px);
+      opacity: 0.12;
+      animation: driftGrid 32s linear infinite;
+    }
+
+    body.light-mode #particle-canvas {
+      opacity: 0.85;
+      filter: saturate(1.05) brightness(1.02);
+    }
+
+    body.dark-mode #particle-canvas {
+      opacity: 1;
+      filter: saturate(1.25);
+    }
+
+    body.light-mode #aurora-canvas {
+      opacity: 0.9;
+      filter: hue-rotate(-4deg) saturate(1.05);
+    }
+
+    body.dark-mode #aurora-canvas {
+      opacity: 1;
+      filter: saturate(1.2);
+    }
+
+    body.theme-transition #particle-canvas,
+    body.theme-transition #aurora-canvas {
+      transition-duration: var(--theme-shift-duration);
     }
 
     body.static-background .static-background-layer {
@@ -146,7 +209,7 @@
     }
 
     body.static-background #particle-canvas,
-    body.static-background #lightwave-canvas {
+    body.static-background #aurora-canvas {
       opacity: 0 !important;
     }
 
@@ -158,78 +221,40 @@
       opacity: 0;
     }
 
-    .background-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-      background: linear-gradient(135deg, var(--overlay-color), rgba(12, 20, 40, 0.55));
-      mix-blend-mode: lighten;
-      opacity: 0.85;
-      transition: opacity 0.6s ease;
-    }
-
-    body.light-mode .background-overlay {
-      mix-blend-mode: screen;
-      background: linear-gradient(135deg, rgba(255, 250, 240, 0.55), rgba(255, 204, 153, 0.35));
-      opacity: 0.6;
-    }
-
-    body::before,
-    body::after {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -3;
-      transition: opacity 0.6s ease, filter 0.6s ease;
-    }
-
-    body::before {
-      background: radial-gradient(circle at 20% 20%, var(--glow-1), transparent 55%),
-                  radial-gradient(circle at 80% 30%, var(--glow-2), transparent 55%),
-                  radial-gradient(circle at 50% 80%, var(--glow-3), transparent 60%);
-      animation: floatGlow 18s ease-in-out infinite alternate;
-    }
-
-    body::after {
-      background-image: repeating-linear-gradient(to right, var(--grid-line), var(--grid-line) 1px, transparent 1px, transparent 70px),
-                        repeating-linear-gradient(to bottom, var(--grid-line), var(--grid-line) 1px, transparent 1px, transparent 70px);
-      opacity: 0.14;
-      z-index: -2;
-      animation: driftGrid 24s linear infinite;
-    }
-
     header {
       padding: 40px 20px 10px;
       position: relative;
     }
 
     h1 {
-      font-size: 3rem;
+      font-size: 3.1rem;
       margin: 0;
-      background: linear-gradient(90deg, var(--accent), var(--accent-alt));
+      background: linear-gradient(135deg, rgba(151, 255, 226, 1), rgba(122, 191, 255, 0.96));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      text-shadow:
+        0 0 26px rgba(79, 216, 194, 0.42),
+        0 0 38px rgba(74, 150, 255, 0.28);
+      letter-spacing: 0.08em;
     }
 
     h2 {
-      font-size: 2rem;
+      font-size: 2.15rem;
       margin: 30px 0 10px;
+      color: var(--text-color);
+      text-shadow: 0 0 18px rgba(79, 216, 194, 0.36);
+    }
+
+    p {
+      color: var(--muted-text);
     }
 
     .intro {
       font-size: 1.1rem;
-      max-width: 700px;
-      margin: auto;
-      line-height: 1.6;
-      color: var(--text-color);
+      max-width: 720px;
+      margin: 18px auto 0;
+      line-height: 1.7;
+      text-shadow: 0 0 10px rgba(6, 22, 35, 0.45);
     }
 
     .theme-toggle {
@@ -237,18 +262,27 @@
       top: 20px;
       right: 20px;
       cursor: pointer;
-      font-size: 1.2rem;
-      background: none;
-      border: 2px solid var(--accent);
-      color: var(--accent);
-      padding: 8px 14px;
-      border-radius: 25px;
-      transition: background 0.3s, color 0.3s;
+      font-size: 1rem;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: var(--button-text);
+      background: linear-gradient(135deg, rgba(92, 247, 214, 0.85), rgba(98, 173, 255, 0.8));
+      box-shadow:
+        0 0 14px var(--surface-glow),
+        0 10px 28px rgba(0, 0, 0, 0.45);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+      letter-spacing: 0.05em;
     }
 
-    .theme-toggle:hover {
-      background-color: var(--accent);
-      color: var(--button-text);
+    .theme-toggle:hover,
+    .theme-toggle:focus-visible {
+      transform: translateY(-2px);
+      box-shadow:
+        0 0 26px var(--hover-glow),
+        0 18px 40px rgba(0, 0, 0, 0.55);
+      filter: brightness(1.1);
+      outline: none;
     }
 
     .project-section {
@@ -269,59 +303,128 @@
     }
 
     .project-card {
-      background-color: var(--card-bg);
-      border-radius: 16px;
+      position: relative;
+      background: linear-gradient(160deg, rgba(10, 32, 44, 0.9), rgba(5, 18, 26, 0.78));
+      border-radius: 18px;
       max-width: 320px;
       text-align: left;
       overflow: hidden;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+      box-shadow:
+        0 22px 48px rgba(0, 0, 0, 0.5),
+        0 0 18px rgba(46, 140, 160, 0.22);
       cursor: pointer;
       border: 1px solid var(--card-border);
+      backdrop-filter: blur(14px);
+      isolation: isolate;
+    }
+
+    .project-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(79, 216, 194, 0.08), transparent 55%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      z-index: -1;
     }
 
     .project-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 12px 28px var(--hover-glow);
+      transform: translateY(-12px) scale(1.01);
+      box-shadow:
+        0 28px 60px rgba(0, 0, 0, 0.6),
+        0 0 32px var(--hover-glow);
+      border-color: rgba(135, 240, 255, 0.45);
+    }
+
+    .project-card:hover::after {
+      opacity: 1;
     }
 
     .project-image {
       height: 200px;
       background-size: cover;
       background-position: center;
+      filter: saturate(0.85) brightness(0.92);
+      transition: filter 0.4s ease;
+    }
+
+    .project-card:hover .project-image {
+      filter: saturate(1.1) brightness(1.05);
     }
 
     .project-content {
-      padding: 20px;
+      padding: 22px;
     }
 
     .project-content h3 {
       margin-top: 0;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
       color: var(--accent);
+      text-shadow: 0 0 16px rgba(79, 216, 194, 0.5);
     }
 
     .project-content p {
-      color: var(--text-color);
-      font-size: 0.95rem;
+      margin-bottom: 0;
+      color: var(--muted-text);
+      line-height: 1.6;
     }
 
     .see-more {
       margin-top: 40px;
     }
 
-    .see-more a {
-      color: var(--button-text);
-      background-color: var(--accent);
-      padding: 10px 20px;
-      text-decoration: none;
-      border-radius: 8px;
+    .see-more a,
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: 999px;
       font-weight: 600;
-      transition: background 0.3s ease;
+      text-decoration: none;
+      color: var(--button-text);
+      background: linear-gradient(135deg, var(--accent), var(--accent-alt));
+      box-shadow:
+        0 0 18px var(--surface-glow),
+        0 16px 32px rgba(0, 0, 0, 0.45);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+      letter-spacing: 0.04em;
     }
 
-    .see-more a:hover {
-      background-color: var(--accent-alt);
+    .see-more a:hover,
+    .see-more a:focus-visible,
+    .cta-button:hover,
+    .cta-button:focus-visible {
+      transform: translateY(-3px);
+      box-shadow:
+        0 0 30px var(--hover-glow),
+        0 22px 46px rgba(0, 0, 0, 0.58);
+      filter: brightness(1.1);
+      outline: none;
+    }
+
+    #contact {
+      margin-top: 80px;
+    }
+
+    .contact-description {
+      max-width: 600px;
+      margin: 0 auto 30px;
+      font-size: 1rem;
+      color: var(--muted-text);
+      line-height: 1.7;
+      text-shadow: 0 0 10px rgba(6, 18, 26, 0.6);
+    }
+
+    .contact-actions {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 20px;
     }
 
     @keyframes floatGlow {
@@ -355,12 +458,29 @@
         top: 10px;
         right: 10px;
       }
+
+      h1 {
+        font-size: 2.6rem;
+      }
+
+      h2 {
+        font-size: 1.8rem;
+      }
+
+      .intro {
+        font-size: 1rem;
+      }
+
+      .project-card {
+        max-width: 360px;
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body class="dark-mode">
 
-  <canvas id="lightwave-canvas"></canvas>
+  <canvas id="aurora-canvas"></canvas>
   <canvas id="particle-canvas"></canvas>
   <div class="static-background-layer static-light"></div>
   <div class="static-background-layer static-dark"></div>
@@ -473,6 +593,8 @@
       if (save) {
         localStorage.setItem(themeStorageKey, theme);
       }
+
+      document.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
     }
 
     function applyInitialTheme() {
@@ -505,6 +627,41 @@
       const ctx = canvas.getContext('2d');
       const particles = [];
       const mobileQuery = window.matchMedia('(max-width: 768px)');
+      const themeParticleStyles = {
+        dark: {
+          starFill: 'rgba(160, 255, 241, 0.94)',
+          starGlow: 'rgba(68, 234, 208, 0.7)',
+          connectionRgb: [90, 210, 255],
+          connectionGlow: 'rgba(40, 160, 188, 0.5)'
+        },
+        light: {
+          starFill: 'rgba(145, 234, 255, 0.92)',
+          starGlow: 'rgba(70, 205, 198, 0.6)',
+          connectionRgb: [76, 185, 220],
+          connectionGlow: 'rgba(45, 140, 170, 0.45)'
+        }
+      };
+      let currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+
+      function connectionColor(opacity) {
+        const style = themeParticleStyles[currentTheme];
+        const [r, g, b] = style.connectionRgb;
+        return `rgba(${r}, ${g}, ${b}, ${0.28 * opacity})`;
+      }
+
+      function updateThemeStyles(theme) {
+        if (theme && themeParticleStyles[theme]) {
+          currentTheme = theme;
+        } else {
+          currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+        }
+      }
+
+      updateThemeStyles();
+
+      document.addEventListener('themechange', (event) => {
+        updateThemeStyles(event.detail?.theme);
+      });
 
       const baseConfig = {
         maxDistance: 170,
@@ -563,10 +720,11 @@
         }
 
         draw() {
+          const style = themeParticleStyles[currentTheme];
           ctx.beginPath();
-          ctx.fillStyle = 'rgba(176, 196, 255, 0.9)';
-          ctx.shadowBlur = 14 * dpr;
-          ctx.shadowColor = 'rgba(111, 82, 237, 0.65)';
+          ctx.fillStyle = style.starFill;
+          ctx.shadowBlur = 18 * dpr;
+          ctx.shadowColor = style.starGlow;
           ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
           ctx.fill();
           ctx.shadowBlur = 0;
@@ -634,10 +792,10 @@
               if (distanceSq < maxDistanceSq) {
                 const distance = Math.sqrt(distanceSq);
                 const opacity = 1 - distance / maxDistance;
-                ctx.strokeStyle = `rgba(111, 82, 237, ${0.22 * opacity})`;
-                ctx.lineWidth = 0.65 * dpr;
-                ctx.shadowBlur = 8 * opacity * dpr;
-                ctx.shadowColor = 'rgba(15, 98, 254, 0.45)';
+                ctx.strokeStyle = connectionColor(opacity);
+                ctx.lineWidth = 0.7 * dpr;
+                ctx.shadowBlur = 10 * opacity * dpr;
+                ctx.shadowColor = themeParticleStyles[currentTheme].connectionGlow;
                 ctx.beginPath();
                 ctx.moveTo(p1.x, p1.y);
                 ctx.lineTo(p2.x, p2.y);
@@ -663,16 +821,13 @@
         lastTimestamp = timestamp;
         const deltaMultiplier = deltaTime / (1000 / 60);
 
-        if (document.body.classList.contains('dark-mode')) {
-          ctx.clearRect(0, 0, width, height);
-          connectionCounts.fill(0);
-          particles.forEach((particle) => {
-            particle.update(deltaMultiplier);
-            particle.draw();
-          });
-          connectParticles();
-        }
-
+        ctx.clearRect(0, 0, width, height);
+        connectionCounts.fill(0);
+        particles.forEach((particle) => {
+          particle.update(deltaMultiplier);
+          particle.draw();
+        });
+        connectParticles();
         requestAnimationFrame(animate);
       }
 
@@ -705,198 +860,155 @@
     })();
 
     (function () {
-      const canvas = document.getElementById('lightwave-canvas');
+      const canvas = document.getElementById('aurora-canvas');
       if (!canvas || staticMode) return;
 
       const ctx = canvas.getContext('2d');
       const mobileQuery = window.matchMedia('(max-width: 768px)');
-
       let width = 0;
       let height = 0;
       let dpr = window.devicePixelRatio || 1;
-      let waveLayers = [];
-      let bubbles = [];
+      let ribbons = [];
+      let palette = {
+        base: '#020910',
+        low: 'rgba(4, 20, 35, 0.92)',
+        high: 'rgba(12, 42, 62, 0.78)',
+        green: 'rgba(72, 196, 170, 0.42)',
+        blue: 'rgba(46, 128, 210, 0.38)',
+        violet: 'rgba(55, 94, 188, 0.32)'
+      };
 
-      function createWaveLayers() {
+      const baseRibbonConfigs = [
+        { key: 'blue', amplitude: 1, vertical: 0.38, frequency: 1.45, speed: 0.00009, blur: 65, opacity: 0.55, drift: 0.015 },
+        { key: 'green', amplitude: 1.25, vertical: 0.55, frequency: 1.25, speed: 0.00007, blur: 85, opacity: 0.58, drift: 0.02 },
+        { key: 'violet', amplitude: 1.5, vertical: 0.72, frequency: 1.05, speed: 0.00006, blur: 95, opacity: 0.5, drift: 0.018 }
+      ];
+
+      function updatePalette() {
+        const styles = getComputedStyle(document.body);
+        palette = {
+          base: styles.getPropertyValue('--aurora-base').trim() || palette.base,
+          low: styles.getPropertyValue('--aurora-low').trim() || palette.low,
+          high: styles.getPropertyValue('--aurora-high').trim() || palette.high,
+          green: styles.getPropertyValue('--aurora-green').trim() || palette.green,
+          blue: styles.getPropertyValue('--aurora-blue').trim() || palette.blue,
+          violet: styles.getPropertyValue('--aurora-violet').trim() || palette.violet
+        };
+      }
+
+      function configureRibbons() {
         const isMobile = mobileQuery.matches;
-        const baseAmplitude = isMobile ? 16 : 30;
-        const baseSpeed = isMobile ? 0.15 : 0.3;
-
-        waveLayers = [
-          {
-            amplitude: baseAmplitude,
-            baseline: () => height * 0.72,
-            speed: baseSpeed,
-            frequency: 2.2,
-            colorTop: 'rgba(255, 196, 140, 0.85)',
-            colorBottom: 'rgba(255, 150, 102, 0.6)',
-            opacity: 0.8,
-            phase: Math.random() * Math.PI * 2
-          },
-          {
-            amplitude: baseAmplitude * 1.35,
-            baseline: () => height * 0.78,
-            speed: baseSpeed * 0.7,
-            frequency: 1.6,
-            colorTop: 'rgba(255, 213, 160, 0.72)',
-            colorBottom: 'rgba(255, 182, 120, 0.55)',
-            opacity: 0.7,
-            phase: Math.random() * Math.PI * 2
-          },
-          {
-            amplitude: baseAmplitude * 1.6,
-            baseline: () => height * 0.86,
-            speed: baseSpeed * 0.5,
-            frequency: 1.2,
-            colorTop: 'rgba(255, 239, 189, 0.68)',
-            colorBottom: 'rgba(255, 205, 160, 0.52)',
-            opacity: 0.6,
-            phase: Math.random() * Math.PI * 2
-          }
-        ];
-      }
-
-      function createBubbles() {
-        const isMobile = mobileQuery.matches;
-        const count = isMobile ? 14 : 28;
-        const radiusRange = isMobile ? [12, 24] : [16, 36];
-        const verticalSpeed = isMobile ? [18, 34] : [28, 52];
-
-        bubbles = new Array(count).fill(null).map(() => new Bubble(radiusRange, verticalSpeed));
-      }
-
-      class Bubble {
-        constructor(radiusRange, speedRange) {
-          this.radiusRange = radiusRange;
-          this.speedRange = speedRange;
-          this.reset(true);
-        }
-
-        reset(initial = false) {
-          this.radius = (this.radiusRange[0] + Math.random() * (this.radiusRange[1] - this.radiusRange[0])) * dpr;
-          this.x = Math.random() * width;
-          this.y = initial ? height + Math.random() * height : height + this.radius * 2;
-          this.floatSpeed = (this.speedRange[0] + Math.random() * (this.speedRange[1] - this.speedRange[0]));
-          this.oscillationRange = (8 + Math.random() * 16) * dpr;
-          this.oscillationSpeed = 0.6 + Math.random() * 0.6;
-          this.phase = Math.random() * Math.PI * 2;
-          this.opacity = 0.18 + Math.random() * 0.25;
-        }
-
-        update(deltaSeconds) {
-          this.phase += this.oscillationSpeed * deltaSeconds;
-          this.y -= this.floatSpeed * dpr * deltaSeconds;
-
-          if (this.y + this.radius < -40 * dpr) {
-            this.reset();
-          }
-        }
-
-        draw(time) {
-          const oscillatedX = this.x + Math.sin(this.phase + time * 0.0006) * this.oscillationRange;
-          const gradient = ctx.createRadialGradient(
-            oscillatedX,
-            this.y,
-            this.radius * 0.2,
-            oscillatedX,
-            this.y,
-            this.radius
-          );
-
-          gradient.addColorStop(0, `rgba(255, 255, 255, ${Math.min(0.75, this.opacity + 0.2)})`);
-          gradient.addColorStop(0.6, `rgba(255, 255, 255, ${this.opacity})`);
-          gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
-          ctx.beginPath();
-          ctx.fillStyle = gradient;
-          ctx.arc(oscillatedX, this.y, this.radius, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-
-      function drawGradientBackground() {
-        const gradient = ctx.createLinearGradient(0, 0, 0, height);
-        gradient.addColorStop(0, 'rgba(255, 227, 189, 1)');
-        gradient.addColorStop(0.4, 'rgba(255, 194, 143, 0.95)');
-        gradient.addColorStop(1, 'rgba(255, 166, 104, 0.95)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, width, height);
-      }
-
-      function drawWaves(deltaSeconds) {
-        waveLayers.forEach((layer) => {
-          layer.phase += layer.speed * deltaSeconds;
-          const baseline = layer.baseline();
-          const step = Math.max(16, width / 36);
-
-          ctx.beginPath();
-          ctx.moveTo(0, baseline);
-          for (let x = 0; x <= width; x += step) {
-            const theta = (x / width) * Math.PI * layer.frequency + layer.phase;
-            const y = baseline + Math.sin(theta) * layer.amplitude * dpr;
-            ctx.lineTo(x, y);
-          }
-          ctx.lineTo(width, height);
-          ctx.lineTo(0, height);
-          ctx.closePath();
-
-          const gradient = ctx.createLinearGradient(0, baseline - 220 * dpr, 0, height);
-          gradient.addColorStop(0, layer.colorTop);
-          gradient.addColorStop(1, layer.colorBottom);
-
-          ctx.globalAlpha = layer.opacity;
-          ctx.fillStyle = gradient;
-          ctx.fill();
-          ctx.globalAlpha = 1;
-        });
-      }
-
-      let lastTimestamp = performance.now();
-
-      function animate(timestamp) {
-        const deltaTime = Math.min(64, timestamp - lastTimestamp);
-        const deltaSeconds = deltaTime / 1000;
-        lastTimestamp = timestamp;
-
-        if (document.body.classList.contains('light-mode')) {
-          ctx.clearRect(0, 0, width, height);
-          drawGradientBackground();
-          drawWaves(deltaSeconds);
-          bubbles.forEach((bubble) => {
-            bubble.update(deltaSeconds);
-            bubble.draw(timestamp);
-          });
-        }
-
-        requestAnimationFrame(animate);
+        const amplitudeBase = height * (isMobile ? 0.12 : 0.18);
+        ribbons = baseRibbonConfigs.map((config) => ({
+          key: config.key,
+          amplitude: amplitudeBase * config.amplitude,
+          vertical: config.vertical,
+          frequency: config.frequency,
+          speed: config.speed,
+          blur: config.blur,
+          opacity: config.opacity,
+          drift: config.drift,
+          phase: Math.random() * Math.PI * 2,
+          offset: Math.random() * Math.PI * 2
+        }));
       }
 
       function resizeCanvas() {
         dpr = window.devicePixelRatio || 1;
-        width = window.innerWidth * dpr;
-        height = window.innerHeight * dpr;
+        width = Math.ceil(window.innerWidth * dpr);
+        height = Math.ceil(window.innerHeight * dpr);
         canvas.width = width;
         canvas.height = height;
         canvas.style.width = window.innerWidth + 'px';
         canvas.style.height = window.innerHeight + 'px';
-        createWaveLayers();
-        createBubbles();
+        configureRibbons();
       }
 
-      const handleLightBreakpoint = () => {
-        createWaveLayers();
-        createBubbles();
+      function drawBackground() {
+        ctx.fillStyle = palette.base;
+        ctx.fillRect(0, 0, width, height);
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, palette.high);
+        gradient.addColorStop(1, palette.low);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      function drawRibbons(timestamp) {
+        ribbons.forEach((ribbon) => {
+          const amplitude = ribbon.amplitude;
+          const baseline = height * (ribbon.vertical + Math.sin(timestamp * 0.00005 + ribbon.offset) * ribbon.drift);
+          const step = Math.max(12, width / 90);
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(0, height);
+          for (let x = 0; x <= width; x += step) {
+            const progress = x / width;
+            const theta = progress * Math.PI * ribbon.frequency + timestamp * ribbon.speed + ribbon.phase;
+            const undulation = Math.sin(progress * 6 + timestamp * 0.0002 + ribbon.offset) * amplitude * 0.15;
+            const y = baseline + Math.sin(theta) * amplitude + undulation;
+            ctx.lineTo(x, y);
+          }
+          ctx.lineTo(width, height);
+          ctx.closePath();
+
+          const color = palette[ribbon.key] || palette.green;
+          const gradient = ctx.createLinearGradient(0, baseline - amplitude * 2.2, 0, baseline + amplitude * 1.8);
+          gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+          gradient.addColorStop(0.35, color);
+          gradient.addColorStop(0.5, 'rgba(240, 255, 255, 0.16)');
+          gradient.addColorStop(0.7, color);
+          gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+          ctx.globalCompositeOperation = 'screen';
+          ctx.filter = `blur(${ribbon.blur * dpr}px)`;
+          ctx.globalAlpha = ribbon.opacity;
+          ctx.fillStyle = gradient;
+          ctx.fill();
+          ctx.restore();
+        });
+
+        ctx.filter = 'none';
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = 0.12;
+        const wash = ctx.createLinearGradient(0, 0, width, height);
+        wash.addColorStop(0, palette.blue);
+        wash.addColorStop(1, palette.green);
+        ctx.fillStyle = wash;
+        ctx.fillRect(0, 0, width, height);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.globalAlpha = 1;
+      }
+
+      function render(timestamp) {
+        drawBackground();
+        drawRibbons(timestamp);
+        requestAnimationFrame(render);
+      }
+
+      function handleThemeChange() {
+        updatePalette();
+        configureRibbons();
+      }
+
+      const handleBreakpointChange = () => {
+        configureRibbons();
       };
 
       if (typeof mobileQuery.addEventListener === 'function') {
-        mobileQuery.addEventListener('change', handleLightBreakpoint);
+        mobileQuery.addEventListener('change', handleBreakpointChange);
       } else if (typeof mobileQuery.addListener === 'function') {
-        mobileQuery.addListener(handleLightBreakpoint);
+        mobileQuery.addListener(handleBreakpointChange);
       }
 
+      document.addEventListener('themechange', handleThemeChange);
       window.addEventListener('resize', resizeCanvas);
+
+      updatePalette();
       resizeCanvas();
-      requestAnimationFrame(animate);
+      requestAnimationFrame(render);
     })();
   </script>
 
