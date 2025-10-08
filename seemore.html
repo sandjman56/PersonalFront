@@ -44,6 +44,12 @@
       --light-gradient-2: #ffc2a1;
       --light-gradient-3: #ff8d90;
       --light-gradient-highlight: rgba(255, 243, 228, 0.55);
+      --dark-gradient-start: #00111f;
+      --dark-gradient-end: #062a44;
+      --light-gradient-start: #f4e1d2;
+      --light-gradient-end: #ffd1c0;
+      --gradient-start: var(--dark-gradient-start);
+      --gradient-end: var(--dark-gradient-end);
     }
 
     body.dark-mode {
@@ -88,15 +94,41 @@
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
-      background-color: var(--bg-color);
+      background: linear-gradient(160deg, var(--gradient-start), var(--gradient-end));
       color: var(--text-color);
       text-align: center;
       padding: 20px;
       min-height: 100vh;
       position: relative;
       overflow-x: hidden;
-      transition: background-color 0.4s ease, color 0.4s ease;
+      transition: background 0.8s ease, background-color 0.4s ease, color 0.4s ease;
       scroll-behavior: smooth;
+    }
+
+    body.dark-mode {
+      --gradient-start: var(--dark-gradient-start);
+      --gradient-end: var(--dark-gradient-end);
+    }
+
+    body.light-mode {
+      --gradient-start: var(--light-gradient-start);
+      --gradient-end: var(--light-gradient-end);
+    }
+
+    body.dark-mode h1,
+    body.dark-mode h2,
+    body.dark-mode p,
+    body.dark-mode h3 {
+      color: #dff3ff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    }
+
+    body.light-mode h1,
+    body.light-mode h2,
+    body.light-mode p,
+    body.light-mode h3 {
+      color: #0b0b0b;
+      text-shadow: 0 1px 4px rgba(255, 255, 255, 0.6);
     }
 
     .light-background {
@@ -286,10 +318,14 @@
       animation: driftGrid 32s linear infinite;
     }
 
-    body.light-mode #particle-canvas,
+    body.light-mode #particle-canvas {
+      opacity: 1;
+      filter: saturate(0.9);
+    }
+
     body.light-mode #aurora-canvas {
-      opacity: 0;
-      filter: saturate(1);
+      opacity: 0.4;
+      filter: saturate(0.8);
     }
 
     body.dark-mode #particle-canvas {
@@ -434,12 +470,12 @@
 
     .project-card {
       position: relative;
-      background: linear-gradient(160deg, rgba(10, 32, 44, 0.9), rgba(5, 18, 26, 0.78));
+      background: rgba(0, 0, 0, 0.35);
       border-radius: 18px;
       max-width: 320px;
       text-align: left;
       overflow: hidden;
-      transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+      transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease, background 0.5s ease;
       box-shadow:
         0 22px 48px rgba(0, 0, 0, 0.5),
         0 0 18px rgba(46, 140, 160, 0.22);
@@ -447,6 +483,14 @@
       border: 1px solid var(--card-border);
       backdrop-filter: blur(14px);
       isolation: isolate;
+    }
+
+    body.light-mode .project-card {
+      background: rgba(255, 255, 255, 0.5);
+      border-color: rgba(255, 255, 255, 0.55);
+      box-shadow:
+        0 22px 48px rgba(255, 188, 160, 0.25),
+        0 0 18px rgba(255, 180, 150, 0.18);
     }
 
     .project-card::after {
@@ -499,6 +543,16 @@
       margin-bottom: 0;
       color: var(--muted-text);
       line-height: 1.6;
+    }
+
+    body.dark-mode .project-content p {
+      color: rgba(223, 243, 255, 0.82);
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+    }
+
+    body.light-mode .project-content p {
+      color: rgba(11, 11, 11, 0.82);
+      text-shadow: 0 1px 4px rgba(255, 255, 255, 0.6);
     }
 
     .see-more {
@@ -783,6 +837,7 @@
     <a href="index.html">← Back to Home</a>
   </div>
 
+  <script src="starfield.js"></script>
   <script>
     const rootStyles = getComputedStyle(document.documentElement);
     const themeShiftDuration = parseFloat(rootStyles.getPropertyValue('--theme-shift-duration')) * 1000 || 1350;
@@ -873,260 +928,12 @@
       document.body.classList.add('static-background');
     }
 
-    (function () {
-      const canvas = document.getElementById('particle-canvas');
-      if (!canvas || staticMode) return;
-
-      const ctx = canvas.getContext('2d');
-      const particles = [];
-      const mobileQuery = window.matchMedia('(max-width: 768px)');
-      const themeParticleStyles = {
-        dark: {
-          starFill: 'rgba(160, 255, 241, 0.94)',
-          starGlow: 'rgba(68, 234, 208, 0.7)',
-          connectionRgb: [90, 210, 255],
-          connectionGlow: 'rgba(40, 160, 188, 0.5)'
-        },
-        light: {
-          starFill: 'rgba(145, 234, 255, 0.92)',
-          starGlow: 'rgba(70, 205, 198, 0.6)',
-          connectionRgb: [76, 185, 220],
-          connectionGlow: 'rgba(45, 140, 170, 0.45)'
-        }
-      };
-      let currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-
-      function connectionColor(opacity) {
-        const style = themeParticleStyles[currentTheme];
-        const [r, g, b] = style.connectionRgb;
-        return `rgba(${r}, ${g}, ${b}, ${0.28 * opacity})`;
-      }
-
-      function updateThemeStyles(theme) {
-        if (theme && themeParticleStyles[theme]) {
-          currentTheme = theme;
-        } else {
-          currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-        }
-      }
-
-      updateThemeStyles();
-
-      document.addEventListener('themechange', (event) => {
-        updateThemeStyles(event.detail?.theme);
-        pausedForLight = currentTheme !== 'dark';
-        if (!pausedForLight) {
-          clearedForLight = false;
-        }
-      });
-
-      const baseConfig = {
-        maxDistance: 170,
-        baseSpeed: 0.14,
-        density: 0.000045,
-        size: [0.9, 2.1],
-        maxCount: 95,
-        maxConnections: 4
-      };
-
-      const mobileConfig = {
-        maxDistance: 135,
-        baseSpeed: 0.1,
-        density: 0.000022,
-        size: [0.8, 1.7],
-        maxCount: 45,
-        maxConnections: 3
-      };
-
-      let width = 0;
-      let height = 0;
-      let dpr = window.devicePixelRatio || 1;
-      let currentConfig = { ...baseConfig };
-      let connectionCounts = new Uint8Array(0);
-      let pausedForLight = currentTheme !== 'dark';
-      let clearedForLight = pausedForLight;
-
-      function updateConfig() {
-        currentConfig = mobileQuery.matches ? { ...mobileConfig } : { ...baseConfig };
-      }
-
-      class Particle {
-        constructor() {
-          this.reset(true);
-        }
-
-        reset(initial = false) {
-          this.x = Math.random() * width;
-          this.y = Math.random() * height;
-          const angle = Math.random() * Math.PI * 2;
-          const speed = (currentConfig.baseSpeed + Math.random() * currentConfig.baseSpeed) * dpr;
-          this.vx = Math.cos(angle) * speed;
-          this.vy = Math.sin(angle) * speed;
-          this.radius = (currentConfig.size[0] + Math.random() * (currentConfig.size[1] - currentConfig.size[0])) * dpr;
-          if (!initial) {
-            this.x = Math.random() < 0.5 ? 0 : width;
-            this.y = Math.random() * height;
-          }
-        }
-
-        update(deltaMultiplier) {
-          this.x += this.vx * deltaMultiplier;
-          this.y += this.vy * deltaMultiplier;
-
-          if (this.x < -50 || this.x > width + 50 || this.y < -50 || this.y > height + 50) {
-            this.reset();
-          }
-        }
-
-        draw() {
-          const style = themeParticleStyles[currentTheme];
-          ctx.beginPath();
-          ctx.fillStyle = style.starFill;
-          ctx.shadowBlur = 18 * dpr;
-          ctx.shadowColor = style.starGlow;
-          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        }
-      }
-
-      function createParticles() {
-        particles.length = 0;
-        const displayArea = window.innerWidth * window.innerHeight;
-        const targetCount = Math.min(
-          currentConfig.maxCount,
-          Math.floor(displayArea * currentConfig.density)
-        );
-        for (let i = 0; i < targetCount; i++) {
-          particles.push(new Particle());
-        }
-        connectionCounts = new Uint8Array(particles.length);
-      }
-
-      function connectParticles() {
-        const maxDistance = currentConfig.maxDistance * dpr;
-        const maxDistanceSq = maxDistance * maxDistance;
-        const cellSize = maxDistance;
-        const grid = new Map();
-
-        for (let i = 0; i < particles.length; i++) {
-          const p = particles[i];
-          const cellX = Math.floor(p.x / cellSize);
-          const cellY = Math.floor(p.y / cellSize);
-          const key = cellX + '|' + cellY;
-          if (!grid.has(key)) {
-            grid.set(key, []);
-          }
-          grid.get(key).push(i);
-        }
-
-        const neighborOffsets = [
-          [0, 0], [1, 0], [-1, 0],
-          [0, 1], [1, 1], [-1, 1],
-          [0, -1], [1, -1], [-1, -1]
-        ];
-
-        const maxConnections = currentConfig.maxConnections;
-        for (let i = 0; i < particles.length; i++) {
-          if (connectionCounts[i] >= maxConnections) continue;
-          const p1 = particles[i];
-          const cellX = Math.floor(p1.x / cellSize);
-          const cellY = Math.floor(p1.y / cellSize);
-
-          for (let k = 0; k < neighborOffsets.length; k++) {
-            const offset = neighborOffsets[k];
-            const neighborKey = (cellX + offset[0]) + '|' + (cellY + offset[1]);
-            const cell = grid.get(neighborKey);
-            if (!cell) continue;
-
-            for (let c = 0; c < cell.length; c++) {
-              const j = cell[c];
-              if (j <= i || connectionCounts[j] >= maxConnections) continue;
-
-              const p2 = particles[j];
-              const dx = p1.x - p2.x;
-              const dy = p1.y - p2.y;
-              const distanceSq = dx * dx + dy * dy;
-
-              if (distanceSq < maxDistanceSq) {
-                const distance = Math.sqrt(distanceSq);
-                const opacity = 1 - distance / maxDistance;
-                ctx.strokeStyle = connectionColor(opacity);
-                ctx.lineWidth = 0.7 * dpr;
-                ctx.shadowBlur = 10 * opacity * dpr;
-                ctx.shadowColor = themeParticleStyles[currentTheme].connectionGlow;
-                ctx.beginPath();
-                ctx.moveTo(p1.x, p1.y);
-                ctx.lineTo(p2.x, p2.y);
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-
-                connectionCounts[i]++;
-                connectionCounts[j]++;
-
-                if (connectionCounts[i] >= maxConnections) break;
-              }
-            }
-
-            if (connectionCounts[i] >= maxConnections) break;
-          }
-        }
-      }
-
-      let lastTimestamp = performance.now();
-
-      function animate(timestamp) {
-        const deltaTime = Math.min(64, timestamp - lastTimestamp);
-        lastTimestamp = timestamp;
-        const deltaMultiplier = deltaTime / (1000 / 60);
-
-        if (pausedForLight) {
-          if (!clearedForLight) {
-            ctx.clearRect(0, 0, width, height);
-            clearedForLight = true;
-          }
-          requestAnimationFrame(animate);
-          return;
-        }
-
-        clearedForLight = false;
-        ctx.clearRect(0, 0, width, height);
-        connectionCounts.fill(0);
-        particles.forEach((particle) => {
-          particle.update(deltaMultiplier);
-          particle.draw();
-        });
-        connectParticles();
-        requestAnimationFrame(animate);
-      }
-
-      function resizeCanvas() {
-        dpr = window.devicePixelRatio || 1;
-        width = window.innerWidth * dpr;
-        height = window.innerHeight * dpr;
-        canvas.width = width;
-        canvas.height = height;
-        canvas.style.width = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
-        updateConfig();
-        createParticles();
-      }
-
-      const handleBreakpointChange = () => {
-        updateConfig();
-        createParticles();
-      };
-
-      if (typeof mobileQuery.addEventListener === 'function') {
-        mobileQuery.addEventListener('change', handleBreakpointChange);
-      } else if (typeof mobileQuery.addListener === 'function') {
-        mobileQuery.addListener(handleBreakpointChange);
-      }
-
-      window.addEventListener('resize', resizeCanvas);
-      resizeCanvas();
-      requestAnimationFrame(animate);
-    })();
+    const starfieldInstance = window.StarfieldBackground?.init({
+      canvasId: 'particle-canvas',
+      heroSelector: 'header',
+      staticMode,
+      theme: document.body.classList.contains('dark-mode') ? 'dark' : 'light'
+    });
 
     (function () {
       const canvas = document.getElementById('aurora-canvas');
