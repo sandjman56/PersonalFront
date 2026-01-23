@@ -185,6 +185,7 @@
       height: 200px;
       background-size: cover;
       background-position: center;
+      position: relative;
     }
 
     .project-content {
@@ -249,6 +250,46 @@
         width: min(360px, 92vw);
       }
     }
+
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      background: rgba(0, 0, 0, 0.35);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .project-card:hover .play-overlay {
+      opacity: 1;
+    }
+
+    .video-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .video-modal-content {
+      width: min(900px, 90vw);
+      aspect-ratio: 16 / 9;
+      background: black;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .video-modal iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
   </style>
 </head>
 <body class="dark">
@@ -283,6 +324,16 @@
             </div>
           </div>
         </a>
+
+        <div class="project-card" onclick="openVideoModal()">
+          <div class="project-image" style="background-image: url('maze.png');">
+            <div class="play-overlay">▶</div>
+          </div>
+          <div class="project-content">
+            <h3>Autonomous Maze Solver</h3>
+            <p>Vision-based 2-DOF tilt-plate system using planning and feedback control.</p>
+          </div>
+        </div>
 
         <a href="https://www.youtube.com/watch?v=KEUcNu6WGT8" class="project-link" target="_blank" rel="noopener noreferrer">
           <div class="project-card">
@@ -323,18 +374,6 @@
             </div>
           </div>
         </a>
-
-
-        
-        <a href="https://lawagent-test.onrender.com/" class="project-link">
-          <div class="project-card">
-            <div class="project-image" style="background-image: url('law.png');"></div>
-            <div class="project-content">
-              <h3>LAWAgent (public demo)</h3>
-              <p>AI powered legal tools allowing lawyers to automate time consuming tasks, optimize workflows and increase efficiency.</p>
-            </div>
-          </div>
-        </a>
       </div>
     </section>
   </main>
@@ -343,7 +382,16 @@
     <a href="index.html">&larr; Back to Home</a>
   </div>
 
-
+  <div id="video-modal" class="video-modal" onclick="closeVideoModal()">
+    <div class="video-modal-content" onclick="event.stopPropagation()">
+      <iframe
+        id="video-frame"
+        src=""
+        allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
 
   <script>
     const themeStorageKey = 'portfolio-theme';
@@ -396,6 +444,17 @@
         setBodyTheme(event.matches ? 'dark' : 'light', { save: false, withTransition: true });
       }
     });
+
+    function openVideoModal() {
+      document.getElementById('video-frame').src =
+        'https://www.youtube.com/embed/-StU_ulJqJY';
+      document.getElementById('video-modal').style.display = 'flex';
+    }
+
+    function closeVideoModal() {
+      document.getElementById('video-frame').src = '';
+      document.getElementById('video-modal').style.display = 'none';
+    }
 
     document.getElementById('current-year').textContent = new Date().getFullYear();
   </script>
