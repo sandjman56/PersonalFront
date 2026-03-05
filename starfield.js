@@ -44,7 +44,7 @@
     }
 
     detectTheme() {
-      return document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+      return document.body.classList.contains('dark') ? 'dark' : 'light';
     }
 
     setTheme(theme) {
@@ -105,8 +105,8 @@
     }
 
     populateStars() {
-      const density = this.width > 1200 ? 0.25 : 0.6;
-      const target = clamp(Math.floor(this.width * density), 60, 600);
+      const density = this.width > 1200 ? 0.06 : 0.09;
+      const target = clamp(Math.floor(this.width * density), 40, 100);
       this.stars = new Array(target).fill(null).map(() => this.createStar());
     }
 
@@ -119,7 +119,7 @@
         vx: Math.cos(angle) * baseSpeed,
         vy: Math.sin(angle) * baseSpeed * 0.6,
         size: 0.8 + Math.random() * 1.4,
-        twinkleSpeed: 0.004 + Math.random() * 0.012,
+        twinkleSpeed: 0.002 + Math.random() * 0.005,
         twinklePhase: Math.random() * Math.PI * 2
       };
     }
