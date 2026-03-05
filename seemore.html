@@ -251,6 +251,25 @@
       }
     }
 
+    #particle-canvas {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body.dark #particle-canvas {
+      display: block;
+    }
+
+    header, main, footer, section, .video-modal, .see-more {
+      position: relative;
+      z-index: 1;
+    }
+
     .play-overlay {
       position: absolute;
       inset: 0;
@@ -293,6 +312,8 @@
   </style>
 </head>
 <body class="dark">
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+
   <header>
     <button class="theme-toggle" type="button">Toggle Theme</button>
     <h1>More Projects</h1>
@@ -426,6 +447,8 @@
       if (save) {
         localStorage.setItem(themeStorageKey, theme);
       }
+
+      document.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }));
     }
 
     function getPreferredTheme() {
@@ -469,7 +492,22 @@
       document.getElementById('video-modal').style.display = 'none';
     }
 
-    document.getElementById('current-year').textContent = new Date().getFullYear();
+  </script>
+
+  <script src="starfield.js"></script>
+  <script>
+    (function () {
+      const isDark = document.body.classList.contains('dark');
+      if (isDark) {
+        StarfieldBackground.init({ theme: 'dark', heroSelector: 'header' });
+      }
+
+      document.addEventListener('themechange', function (e) {
+        if (e.detail.theme === 'dark' && !window._starfield) {
+          window._starfield = StarfieldBackground.init({ theme: 'dark', heroSelector: 'header' });
+        }
+      });
+    })();
   </script>
 </body>
 </html>
